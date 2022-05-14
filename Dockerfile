@@ -27,8 +27,8 @@ RUN apk add --no-cache --virtual .build-deps git \
 	&& apk del .build-deps
 
 COPY index.js .eslint* ./
-#COPY ./migrations ./migrations
-#COPY ./seeds ./seeds
+# COPY ./migrations ./migrations
+# COPY ./seeds ./seeds
 # COPY ./test ./test
 # COPY ./lib ./lib
 # COPY ./config ./config

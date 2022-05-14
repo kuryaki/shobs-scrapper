@@ -1,8 +1,9 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
-const { cp } = require('fs');
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
 
-const getPostTitles = async () => {
+const getPosts = async () => {
 	try {
 		const { data } = await axios.get('https://www.indeed.com/jobs?q=Engineering%20Manager&l=Remote');
 		const $ = cheerio.load(data);
@@ -14,11 +15,11 @@ const getPostTitles = async () => {
             const salary = $(el).find('.salaryOnly');
             const post = {
                 source: 'indeed',
-                externald: title.find('a').attr('id'),
+                externalId: title.find('a').attr('id'),
                 isNew: title.children().length === 2,
                 title: title.children().last().text(),
                 company: company.find('.companyName').text(),
-                companyLocation: company.find('.companyLocation').text(),
+                location: company.find('.companyLocation').text(),
                 salary: salary.children().first().text(),
                 duration: salary.children().last().text(),
             };
@@ -31,5 +32,20 @@ const getPostTitles = async () => {
 	}
 };
 
-getPostTitles()
-.then((postTitles) => console.log(postTitles));
+const savePosts = async (posts) => {
+    try {
+        await prisma.posts.createMany({
+            data: posts,
+            skipDuplicates: true
+        })
+    } catch (error) {
+		throw error;
+	}
+}
+
+getPosts()
+    .then(savePosts)
+    .catch(console.error)
+    .finally(async () => {
+        await prisma.$disconnect()
+    });
