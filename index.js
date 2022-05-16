@@ -3,10 +3,32 @@ const cheerio = require('cheerio');
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-const getPosts = async () => {
+
+const getPage = async (search, location , start) => {
+    try {
+        let posts = [];
+        let lastPage = false;
+        const perPage = 10;
+
+        while(!lastPage) {
+            const url = `https://www.indeed.com/jobs?q=${search}&l=${location}&start=${start}`;
+            const { data } = await axios.get(url);
+            const $ = cheerio.load(data);
+            lastPage = !!$('.pagination-list li').last().text();
+            start += perPage;
+            const batch = await getPosts($);
+            posts = posts.concat(batch);
+            console.log(url, batch.length, posts.length, { lastPage });
+        }
+
+        return posts;
+    } catch (error) {
+        throw error;
+    }
+}
+
+const getPosts = async ($) => {
 	try {
-		const { data } = await axios.get('https://www.indeed.com/jobs?q=Engineering%20Manager&l=Remote');
-		const $ = cheerio.load(data);
 		const posts = [];
 
 		$('.resultContent').each((_idx, el) => {
@@ -33,6 +55,7 @@ const getPosts = async () => {
 };
 
 const savePosts = async (posts) => {
+    console.log(posts.length, 'processed');
     try {
         await prisma.posts.createMany({
             data: posts,
@@ -43,8 +66,8 @@ const savePosts = async (posts) => {
 	}
 }
 
-getPosts()
-    .then(savePosts)
+getPage('Software%20Engineer', 'Remote', 0)
+ .then(savePosts)
     .catch(console.error)
     .finally(async () => {
         await prisma.$disconnect()
