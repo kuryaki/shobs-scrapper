@@ -17,6 +17,8 @@ model posts {
   location      String
   salary        String
   duration      String
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @default(now())
 
   @@unique([externalId])
 }

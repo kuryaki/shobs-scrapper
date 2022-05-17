@@ -72,3 +72,18 @@ getPage('Software%20Engineer', 'Remote', 0)
     .finally(async () => {
         await prisma.$disconnect()
     });
+
+getPage('Engineering%20Manager', 'Remote', 0)
+.then(savePosts)
+    .catch(console.error)
+    .finally(async () => {
+        await prisma.$disconnect()
+    });
+
+getPage('Lead%20Software%20engineer', 'Remote', 0)
+.then(savePosts)
+    .catch(console.error)
+    .finally(async () => {
+        await prisma.$disconnect()
+    });
+

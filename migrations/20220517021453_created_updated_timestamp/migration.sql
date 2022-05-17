@@ -1,12 +1,3 @@
-/*
-  Warnings:
-
-  - You are about to drop the `Post` table. If the table is not empty, all the data it contains will be lost.
-
-*/
--- DropTable
-DROP TABLE "Post";
-
 -- CreateTable
 CREATE TABLE "posts" (
     "id" SERIAL NOT NULL,
@@ -18,6 +9,8 @@ CREATE TABLE "posts" (
     "location" TEXT NOT NULL,
     "salary" TEXT NOT NULL,
     "duration" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "posts_pkey" PRIMARY KEY ("id")
 );
